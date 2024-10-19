@@ -8,7 +8,17 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('First Screen'),
+        title: const Text('InfoBitcoin', style: TextStyle(fontFamily: 'Bebas', fontWeight: FontWeight.bold, fontSize: 30),),
+        centerTitle: true,
+        foregroundColor: Colors.orangeAccent,
+        backgroundColor: Colors.black,
+        elevation: 0,
+        actions: <Widget>[
+          IconButton(
+            onPressed: () {},
+            icon: const Icon(Icons.more_vert),
+          ),
+        ],
       ),
       body: Center(
         child: ElevatedButton(
