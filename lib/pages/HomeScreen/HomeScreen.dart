@@ -1,4 +1,3 @@
-// ignore_for_file: file_names, library_private_types_in_public_api
 import 'package:flutter/material.dart';
 import 'package:info_bitcoin/Services/crypto_service.dart';
 import 'package:info_bitcoin/pages/custom/search_input.dart';
@@ -13,12 +12,13 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final TextEditingController _searchController = TextEditingController();
   late Future<List<dynamic>> _cryptoData;
-  List<dynamic> _filteredCryptos = []; // Lista filtrada
+  List<dynamic> _allCryptos = [];
+  List<dynamic> _filteredCryptos = [];
 
   @override
   void initState() {
     super.initState();
-    _cryptoData = CryptoService().getCryptos();  
+    _cryptoData = CryptoService().getCryptos();
 
     _searchController.addListener(_filterCryptos);
   }
@@ -31,14 +31,17 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _filterCryptos() {
-    final query = _searchController.text.toLowerCase();
+    final query = _searchController.text.toLowerCase().trim();
+
     setState(() {
-      _filteredCryptos = _cryptoData.then((cryptos) {
-        return cryptos.where((crypto) {
-          final cryptoName = crypto['name'].toLowerCase();
+      if (query.isEmpty) {
+        _filteredCryptos = _allCryptos;
+      } else {
+        _filteredCryptos = _allCryptos.where((crypto) {
+          final cryptoName = crypto['name'].toLowerCase().trim();
           return cryptoName.contains(query);
         }).toList();
-      }) as List;
+      }
     });
   }
 
@@ -89,9 +92,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              
               const SizedBox(height: 10),
-
               Expanded(
                 child: FutureBuilder<List<dynamic>>(
                   future: _cryptoData,
@@ -102,16 +103,19 @@ class _HomePageState extends State<HomePage> {
 
                     if (snapshot.hasError) {
                       return Center(
-                        child: Text('Erro ao carregar dados: ${snapshot.error}'),
+                        child:
+                            Text('Erro ao carregar dados: ${snapshot.error}'),
                       );
                     }
 
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(child: Text('Nenhuma criptomoeda encontrada.'));
+                      return const Center(
+                          child: Text('Nenhuma criptomoeda encontrada.'));
                     }
 
-                    if (_filteredCryptos.isEmpty) {
-                      _filteredCryptos = snapshot.data!;
+                    if (_allCryptos.isEmpty && snapshot.data != null) {
+                      _allCryptos = snapshot.data!;
+                      _filteredCryptos = _allCryptos;
                     }
 
                     return ListView.builder(

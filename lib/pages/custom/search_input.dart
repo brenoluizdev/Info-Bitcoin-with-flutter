@@ -26,6 +26,7 @@ class CustomSearchInput extends StatelessWidget {
                 child: Container(
                   margin: const EdgeInsets.all(10.0),
                   child: TextFormField(
+                    controller: controller,
                     decoration: InputDecoration(
                       focusColor: CustomColors.white,
                       fillColor: CustomColors.inputBackground,
@@ -41,7 +42,11 @@ class CustomSearchInput extends StatelessWidget {
                       prefixIcon: prefixIcon,
                       iconColor: CustomColors.inputIconColor,
                       labelText: labelText,
-                      hintStyle: const TextStyle(color: CustomColors.inputTextColor, fontSize: 16.0, fontWeight: FontWeight.w500),
+                      hintStyle: const TextStyle(
+                        color: CustomColors.inputTextColor,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500,
+                      ),
                       hintText: hintText,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0),
