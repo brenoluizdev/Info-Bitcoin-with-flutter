@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:info_bitcoin/pages/custom/colors.dart';
 
 class CustomSearchInput extends StatelessWidget {
   final TextEditingController controller;
@@ -26,11 +27,21 @@ class CustomSearchInput extends StatelessWidget {
                   margin: const EdgeInsets.all(10.0),
                   child: TextFormField(
                     decoration: InputDecoration(
-                      focusColor: Colors.white,
-                      fillColor: Colors.white,
+                      focusColor: CustomColors.white,
+                      fillColor: CustomColors.inputBackground,
                       filled: true,
+                      contentPadding: const EdgeInsets.all(15.0),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(30.0),
+                        borderSide: const BorderSide(
+                          color: CustomColors.grey,
+                          width: 2.0,
+                        ),
+                      ),
                       prefixIcon: prefixIcon,
+                      iconColor: CustomColors.inputIconColor,
                       labelText: labelText,
+                      hintStyle: const TextStyle(color: CustomColors.inputTextColor, fontSize: 16.0, fontWeight: FontWeight.w500),
                       hintText: hintText,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(30.0),
