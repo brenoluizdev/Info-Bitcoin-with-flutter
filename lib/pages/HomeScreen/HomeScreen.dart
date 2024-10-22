@@ -1,52 +1,16 @@
+// ignore_for_file: file_names
+
 import 'package:flutter/material.dart';
-import 'package:info_bitcoin/Services/crypto_service.dart';
+import 'package:info_bitcoin/pages/HomeScreen/controller/homePage_controller.dart';
 import 'package:info_bitcoin/pages/custom/search_input.dart';
 
-class HomePage extends StatefulWidget {
+class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
-}
-
-class _HomePageState extends State<HomePage> {
-  final TextEditingController _searchController = TextEditingController();
-  late Future<List<dynamic>> _cryptoData;
-  List<dynamic> _allCryptos = [];
-  List<dynamic> _filteredCryptos = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _cryptoData = CryptoService().getCryptos();
-
-    _searchController.addListener(_filterCryptos);
-  }
-
-  @override
-  void dispose() {
-    _searchController.removeListener(_filterCryptos);
-    _searchController.dispose();
-    super.dispose();
-  }
-
-  void _filterCryptos() {
-    final query = _searchController.text.toLowerCase().trim();
-
-    setState(() {
-      if (query.isEmpty) {
-        _filteredCryptos = _allCryptos;
-      } else {
-        _filteredCryptos = _allCryptos.where((crypto) {
-          final cryptoName = crypto['name'].toLowerCase().trim();
-          return cryptoName.contains(query);
-        }).toList();
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
+    final HomePageController controller = HomePageController();
+
     return Scaffold(
       appBar: AppBar(
         title: const Text(
@@ -76,7 +40,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   Expanded(
                     child: CustomSearchInput(
-                      controller: _searchController,
+                      controller: controller.searchController,
                       hintText: 'Pesquisar...',
                       prefixIcon: const Icon(Icons.search, size: 30.0),
                     ),
@@ -95,7 +59,7 @@ class _HomePageState extends State<HomePage> {
               const SizedBox(height: 10),
               Expanded(
                 child: FutureBuilder<List<dynamic>>(
-                  future: _cryptoData,
+                  future: controller.cryptoData,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -103,34 +67,37 @@ class _HomePageState extends State<HomePage> {
 
                     if (snapshot.hasError) {
                       return Center(
-                        child:
-                            Text('Erro ao carregar dados: ${snapshot.error}'),
+                        child: Text('Erro ao carregar dados: ${snapshot.error}'),
                       );
                     }
 
                     if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return const Center(
-                          child: Text('Nenhuma criptomoeda encontrada.'));
+                      return const Center(child: Text('Nenhuma criptomoeda encontrada.'));
                     }
 
-                    if (_allCryptos.isEmpty && snapshot.data != null) {
-                      _allCryptos = snapshot.data!;
-                      _filteredCryptos = _allCryptos;
+                    if (controller.allCryptos.isEmpty && snapshot.data != null) {
+                      controller.allCryptos = snapshot.data!;
+                      controller.filteredCryptos.value = List.from(controller.allCryptos);
                     }
 
-                    return ListView.builder(
-                      itemCount: _filteredCryptos.length,
-                      itemBuilder: (context, index) {
-                        var crypto = _filteredCryptos[index];
-                        return ListTile(
-                          title: Text(crypto['name']),
-                          subtitle: Text('Preço: \$${crypto['current_price']}'),
-                          leading: Image.network(
-                            crypto['image'],
-                            width: 40,
-                            height: 40,
-                            fit: BoxFit.cover,
-                          ),
+                    return ValueListenableBuilder<List<dynamic>>(
+                      valueListenable: controller.filteredCryptos,
+                      builder: (context, filteredCryptos, child) {
+                        return ListView.builder(
+                          itemCount: filteredCryptos.length,
+                          itemBuilder: (context, index) {
+                            var crypto = filteredCryptos[index];
+                            return ListTile(
+                              title: Text(crypto['name']),
+                              subtitle: Text('Preço: \$${crypto['current_price']}'),
+                              leading: Image.network(
+                                crypto['image'],
+                                width: 40,
+                                height: 40,
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          },
                         );
                       },
                     );
