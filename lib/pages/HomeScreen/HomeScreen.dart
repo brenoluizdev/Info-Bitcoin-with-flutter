@@ -24,9 +24,7 @@ class HomePage extends StatelessWidget {
         elevation: 0,
         actions: <Widget>[
           IconButton(
-            onPressed: () {
-              Navigator.pushNamed(context, '/details');
-            },
+            onPressed: () {},
             icon: const Icon(Icons.more_vert),
           ),
         ],
